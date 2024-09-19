@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.11"
 flask = "^3.0.3"
 requests = "^2.32.3"
+beautifulsoup4 = "^4.12.3"
 
 
 [build-system]

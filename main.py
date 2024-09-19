@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import logging
+from bs4 import BeautifulSoup
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,13 +22,21 @@ def index():
         try:
             logging.info(f"Sending request to webhook: {webhook_url}")
             response = requests.post(webhook_url, json=payload, timeout=180)
-            response.raise_for_status()  # Raise an exception for bad status codes
-            data = response.json()
-            if "Analysis" in data:
-                return jsonify({"analysis": data["Analysis"]}), 200
-            else:
-                logging.error("Analysis data not found in response")
-                return jsonify({"error": "Analysis data not found in response"}), 500
+            response.raise_for_status()
+
+            # Parse the HTML-like response
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Extract the analysis data
+            analysis = {}
+            for element in soup.find_all('p'):
+                key = element.find('strong')
+                if key:
+                    key_text = key.text.strip().rstrip(':')
+                    value = element.text.replace(key.text, '').strip()
+                    analysis[key_text] = value
+
+            return jsonify({"analysis": analysis}), 200
         except requests.exceptions.Timeout:
             logging.error("Webhook request timed out")
             return jsonify({"error": "Webhook request timed out"}), 504

@@ -39,7 +39,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Display results in HTML format
             if (data.analysis) {
-                resultsElement.innerHTML = `<h2>Research Results:</h2>${data.analysis}`;
+                let analysisHtml = '<h2>Research Results:</h2>';
+                for (const [key, value] of Object.entries(data.analysis)) {
+                    analysisHtml += `<p><strong>${key}:</strong> ${value}</p>`;
+                }
+                resultsElement.innerHTML = analysisHtml;
             } else {
                 resultsElement.innerHTML = `<h2>Error:</h2><p>${data.error || 'Unknown error occurred'}</p>`;
             }
