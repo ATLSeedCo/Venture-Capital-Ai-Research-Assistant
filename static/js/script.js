@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                return response.json().then(errorData => {
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                });
             }
             return response.json();
         })
@@ -46,8 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Hide loading message and spinner
             loadingElement.style.display = 'none';
 
-            // Display error message
+            // Display detailed error message
             resultsElement.innerHTML = `<h2>Error:</h2><p>${error.message}</p>`;
+            console.error('Error:', error);
         });
     });
 });

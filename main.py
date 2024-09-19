@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 import requests
-import time
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -10,7 +12,6 @@ def index():
         company_name = request.form['company_name']
         company_website = request.form['company_website']
         
-        # Send data to webhook
         webhook_url = "https://hook.us1.make.com/mqol68vq6uvurtuu1gmviced7hp0b1fl"
         payload = {
             "company_name": company_name,
@@ -18,19 +19,24 @@ def index():
         }
         
         try:
-            response = requests.post(webhook_url, json=payload, timeout=180)  # 3 minutes timeout
-            if response.status_code == 200:
-                data = response.json()
-                if "Analysis" in data:
-                    return jsonify({"analysis": data["Analysis"]}), 200
-                else:
-                    return jsonify({"error": "Analysis data not found in response"}), 500
+            logging.info(f"Sending request to webhook: {webhook_url}")
+            response = requests.post(webhook_url, json=payload, timeout=180)
+            response.raise_for_status()  # Raise an exception for bad status codes
+            data = response.json()
+            if "Analysis" in data:
+                return jsonify({"analysis": data["Analysis"]}), 200
             else:
-                return jsonify({"error": "Webhook request failed"}), 500
+                logging.error("Analysis data not found in response")
+                return jsonify({"error": "Analysis data not found in response"}), 500
         except requests.exceptions.Timeout:
+            logging.error("Webhook request timed out")
             return jsonify({"error": "Webhook request timed out"}), 504
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Webhook request failed: {str(e)}")
+            return jsonify({"error": f"Webhook request failed: {str(e)}"}), 500
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            logging.error(f"Unexpected error: {str(e)}")
+            return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
     
     return render_template('index.html')
 
