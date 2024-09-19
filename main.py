@@ -29,42 +29,17 @@ def index():
             response = requests.post(webhook_url, json=payload, timeout=180)
             response.raise_for_status()
 
-            # Process the plain text response
-            text_response = response.text
-            analysis = {}
-            current_section = None
-            sections = ["Company Name", "Company Overview", "Recent News", "Investment Analysis"]
-
-            for line in text_response.split('\n'):
-                line = line.strip()
-                if line.startswith('**') and line.endswith(':**'):
-                    current_section = line.strip('*:')
-                    if current_section in sections:
-                        analysis[current_section] = ""
-                elif current_section and line:
-                    analysis[current_section] += line + " "
-
-            # Clean up the values
-            for key in analysis:
-                analysis[key] = analysis[key].strip()
-
-            # If any section is missing, add it with an empty string
-            for section in sections:
-                if section not in analysis:
-                    analysis[section] = ""
-
-            logging.info(f"Processed analysis: {analysis}")
-
-            return jsonify({"analysis": analysis}), 200
+            # Directly return the JSON response from the webhook
+            return response.json(), 200
         except requests.exceptions.Timeout:
             logging.error("Webhook request timed out")
-            return jsonify({"error": "Webhook request timed out"}), 504
+            return jsonify({"error": "The request to our analysis service timed out. Please try again later."}), 504
         except requests.exceptions.RequestException as e:
             logging.error(f"Webhook request failed: {str(e)}")
-            return jsonify({"error": f"Webhook request failed: {str(e)}"}), 500
+            return jsonify({"error": "There was an error connecting to our analysis service. Please try again later."}), 500
         except Exception as e:
             logging.error(f"Unexpected error: {str(e)}")
-            return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+            return jsonify({"error": "An unexpected error occurred. Our team has been notified."}), 500
     
     return render_template('index.html')
 
