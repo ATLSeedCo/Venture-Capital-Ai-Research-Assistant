@@ -31,9 +31,10 @@ def index():
 
             for line in text_response.split('\n'):
                 line = line.strip()
-                if line in sections:
-                    current_section = line
-                    analysis[current_section] = ""
+                if line.startswith('**') and line.endswith(':**'):
+                    current_section = line.strip('*:')
+                    if current_section in sections:
+                        analysis[current_section] = ""
                 elif current_section and line:
                     analysis[current_section] += line + " "
 
