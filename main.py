@@ -1,7 +1,11 @@
+import os
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import requests
 import logging
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,14 +18,14 @@ def index():
         company_name = request.form['company_name']
         company_website = request.form['company_website']
         
-        webhook_url = "https://hook.us1.make.com/mqol68vq6uvurtuu1gmviced7hp0b1fl"
+        webhook_url = os.getenv('WEBHOOK_URL')
         payload = {
             "company_name": company_name,
             "company_website": company_website
         }
         
         try:
-            logging.info(f"Sending request to webhook: {webhook_url}")
+            logging.info(f"Sending request to webhook")
             response = requests.post(webhook_url, json=payload, timeout=180)
             response.raise_for_status()
 
