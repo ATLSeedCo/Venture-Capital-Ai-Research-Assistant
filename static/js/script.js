@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const companyName = document.getElementById('companyName').value;
         const companyWebsite = document.getElementById('companyWebsite').value;
 
@@ -27,26 +27,47 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                return response.json().then(errorData => {
-                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-                });
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.json();
+            return response.text();
         })
         .then(data => {
             // Hide loading message and spinner
             loadingElement.style.display = 'none';
 
-            // Display results in HTML format
-            if (data.analysis) {
-                let analysisHtml = '<h2>Research Results:</h2>';
-                for (const [key, value] of Object.entries(data.analysis)) {
+            // Parse the JSON data
+            let jsonData;
+            try {
+                jsonData = JSON.parse(data);
+            } catch (error) {
+                throw new Error('Failed to parse JSON response');
+            }
+
+            // Define the desired order of sections, now including Competitors
+            const sectionOrder = [
+                "Company Name",
+                "Company Overview",
+                "Recent News",
+                "Competitors",
+                "Investment Analysis"
+            ];
+
+            // Display results in HTML format with specified order
+            let analysisHtml = '<h2>Research Results:</h2>';
+            sectionOrder.forEach(section => {
+                if (jsonData.hasOwnProperty(section)) {
+                    analysisHtml += `<h3>${section}:</h3><p>${jsonData[section]}</p>`;
+                }
+            });
+
+            // Add any additional sections not specified in the order
+            for (const [key, value] of Object.entries(jsonData)) {
+                if (!sectionOrder.includes(key)) {
                     analysisHtml += `<h3>${key}:</h3><p>${value}</p>`;
                 }
-                resultsElement.innerHTML = analysisHtml;
-            } else {
-                resultsElement.innerHTML = `<h2>Error:</h2><p>${data.error || 'Unknown error occurred'}</p>`;
             }
+
+            resultsElement.innerHTML = analysisHtml;
         })
         .catch(error => {
             // Hide loading message and spinner
