@@ -26,18 +26,27 @@ def index():
             # Process the plain text response
             text_response = response.text
             analysis = {}
-            current_key = None
+            current_section = None
+            sections = ["Company Name", "Company Overview", "Recent News", "Investment Analysis"]
+
             for line in text_response.split('\n'):
                 line = line.strip()
-                if line.startswith('**') and line.endswith('**'):
-                    current_key = line.strip('**:')
-                    analysis[current_key] = ""
-                elif current_key and line:
-                    analysis[current_key] += line + " "
+                if line in sections:
+                    current_section = line
+                    analysis[current_section] = ""
+                elif current_section and line:
+                    analysis[current_section] += line + " "
 
             # Clean up the values
             for key in analysis:
                 analysis[key] = analysis[key].strip()
+
+            # If any section is missing, add it with an empty string
+            for section in sections:
+                if section not in analysis:
+                    analysis[section] = ""
+
+            logging.info(f"Processed analysis: {analysis}")
 
             return jsonify({"analysis": analysis}), 200
         except requests.exceptions.Timeout:
