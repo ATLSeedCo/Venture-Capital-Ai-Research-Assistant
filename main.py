@@ -11,7 +11,7 @@ def index():
         company_website = request.form['company_website']
         
         # Send data to webhook
-        webhook_url = "https://example.com/webhook"  # Replace with actual webhook URL
+        webhook_url = "https://hook.us1.make.com/mqol68vq6uvurtuu1gmviced7hp0b1fl"
         payload = {
             "company_name": company_name,
             "company_website": company_website
@@ -20,7 +20,11 @@ def index():
         try:
             response = requests.post(webhook_url, json=payload, timeout=180)  # 3 minutes timeout
             if response.status_code == 200:
-                return jsonify(response.json()), 200
+                data = response.json()
+                if "Analysis" in data:
+                    return jsonify({"analysis": data["Analysis"]}), 200
+                else:
+                    return jsonify({"error": "Analysis data not found in response"}), 500
             else:
                 return jsonify({"error": "Webhook request failed"}), 500
         except requests.exceptions.Timeout:

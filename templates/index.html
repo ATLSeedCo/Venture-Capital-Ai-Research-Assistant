@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Research Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body, input, button {
+            font-family: 'Inconsolata', monospace;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -19,10 +25,7 @@
             <button type="submit">Run Research Analysis</button>
         </form>
 
-        <div id="loading">
-            <p>Processing your request. Please wait...</p>
-            <div class="spinner"></div>
-        </div>
+        <div id="loading"></div>
 
         <div id="results"></div>
     </div>

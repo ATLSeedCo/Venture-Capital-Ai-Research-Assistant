@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show loading message and spinner
         loadingElement.style.display = 'block';
+        loadingElement.innerHTML = '<p>Running Research Analysis</p><div class="spinner"></div>';
         resultsElement.innerHTML = '';
 
         // Send POST request to server
@@ -34,8 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Hide loading message and spinner
             loadingElement.style.display = 'none';
 
-            // Display results
-            resultsElement.innerHTML = `<h2>Research Results:</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            // Display results in HTML format
+            if (data.analysis) {
+                resultsElement.innerHTML = `<h2>Research Results:</h2>${data.analysis}`;
+            } else {
+                resultsElement.innerHTML = `<h2>Error:</h2><p>${data.error || 'Unknown error occurred'}</p>`;
+            }
         })
         .catch(error => {
             // Hide loading message and spinner
