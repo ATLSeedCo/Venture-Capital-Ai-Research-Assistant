@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import logging
-from bs4 import BeautifulSoup
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,17 +23,21 @@ def index():
             response = requests.post(webhook_url, json=payload, timeout=180)
             response.raise_for_status()
 
-            # Parse the HTML-like response
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # Extract the analysis data
+            # Process the plain text response
+            text_response = response.text
             analysis = {}
-            for element in soup.find_all('p'):
-                key = element.find('strong')
-                if key:
-                    key_text = key.text.strip().rstrip(':')
-                    value = element.text.replace(key.text, '').strip()
-                    analysis[key_text] = value
+            current_key = None
+            for line in text_response.split('\n'):
+                line = line.strip()
+                if line.startswith('**') and line.endswith('**'):
+                    current_key = line.strip('**:')
+                    analysis[current_key] = ""
+                elif current_key and line:
+                    analysis[current_key] += line + " "
+
+            # Clean up the values
+            for key in analysis:
+                analysis[key] = analysis[key].strip()
 
             return jsonify({"analysis": analysis}), 200
         except requests.exceptions.Timeout:

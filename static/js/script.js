@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.analysis) {
                 let analysisHtml = '<h2>Research Results:</h2>';
                 for (const [key, value] of Object.entries(data.analysis)) {
-                    analysisHtml += `<p><strong>${key}:</strong> ${value}</p>`;
+                    analysisHtml += `<h3>${key}:</h3><p>${value}</p>`;
                 }
                 resultsElement.innerHTML = analysisHtml;
             } else {
