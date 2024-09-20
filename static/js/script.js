@@ -19,8 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const element = document.getElementById(elementId);
         if (show) {
             element.innerHTML = '<div class="spinner"></div>';
+            element.style.display = 'block';
         } else {
             element.innerHTML = '';
+            element.style.display = 'none';
         }
     }
 
@@ -109,7 +111,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const researchData = resultsElement.innerHTML;
 
         // Show loading spinner
-        toggleLoadingSpinner(true, 'emailConfirmation');
+        const confirmationElement = document.getElementById('emailConfirmation');
+        confirmationElement.innerHTML = '<div class="spinner"></div>';
+        confirmationElement.style.display = 'block';
 
         fetch('/export_email', {
             method: 'POST',
@@ -129,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             // Hide loading spinner
-            toggleLoadingSpinner(false, 'emailConfirmation');
+            confirmationElement.innerHTML = '';
 
             if (data.error) {
                 showEmailConfirmation(`Failed to send email: ${data.error}`, true);
@@ -140,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             // Hide loading spinner
-            toggleLoadingSpinner(false, 'emailConfirmation');
+            confirmationElement.innerHTML = '';
 
             console.error('Error:', error);
             showEmailConfirmation('Failed to send email. Please try again.', true);
