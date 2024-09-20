@@ -69,7 +69,8 @@ def export_email():
         response.raise_for_status()
         logging.info(f"Received response from email export webhook: {response.status_code}")
         
-        return jsonify({"message": "Email export request sent successfully"}), 200
+        # Return the webhook response to the frontend
+        return jsonify(response.json()), 200
     except requests.exceptions.RequestException as e:
         logging.error(f"Email export webhook request failed: {str(e)}")
         return jsonify({"error": f"There was an error sending the email export request: {str(e)}"}), 500

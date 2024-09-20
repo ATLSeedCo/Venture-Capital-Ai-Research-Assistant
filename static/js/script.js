@@ -5,13 +5,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const emailExportElement = document.getElementById('emailExport');
     const emailForm = document.getElementById('emailForm');
 
-    function showEmailConfirmation(message) {
+    function showEmailConfirmation(message, isError = false) {
         const confirmationElement = document.getElementById('emailConfirmation');
         confirmationElement.textContent = message;
+        confirmationElement.style.color = isError ? 'red' : 'green';
         confirmationElement.style.display = 'block';
         setTimeout(() => {
             confirmationElement.style.display = 'none';
-        }, 3000);
+        }, 5000);
     }
 
     form.addEventListener('submit', function(e) {
@@ -115,12 +116,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            showEmailConfirmation('Email Sent!');
-            document.getElementById('emailInput').value = ''; // Clear the email input
+            if (data.error) {
+                showEmailConfirmation(`Failed to send email: ${data.error}`, true);
+            } else {
+                showEmailConfirmation('Email Sent! ' + (data.message || ''));
+                document.getElementById('emailInput').value = ''; // Clear the email input
+            }
         })
         .catch(error => {
             console.error('Error:', error);
-            showEmailConfirmation('Failed to send email. Please try again.');
+            showEmailConfirmation('Failed to send email. Please try again.', true);
         });
     });
 });
