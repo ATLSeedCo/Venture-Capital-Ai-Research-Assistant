@@ -95,3 +95,38 @@ button:hover {
 #results a {
     word-break: break-all;
 }
+
+#emailExport {
+    margin-top: 20px;
+}
+
+.email-input-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#emailInput {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#emailForm button {
+    padding: 10px 20px;
+    font-size: 16px;
+    height: 100%;
+}
+
+@media (max-width: 480px) {
+    .email-input-group {
+        flex-direction: column;
+    }
+
+    #emailInput, #emailForm button {
+        width: 100%;
+    }
+}
