@@ -69,12 +69,12 @@ def export_email():
         response.raise_for_status()
         logging.info(f"Received response from email export webhook: {response.status_code}")
         
-        response_text = response.text.strip()
-        return jsonify({"message": response_text}), 200
+        response_html = response.text.strip()
+        return jsonify({"message": response_html, "content_type": "html"}), 200
     except requests.exceptions.RequestException as e:
         logging.error(f"Email export webhook request failed: {str(e)}")
         response_text = e.response.text if hasattr(e, 'response') and e.response is not None else str(e)
-        return jsonify({"error": f"There was an error sending the email export request: {response_text}"}), 500
+        return jsonify({"error": f"There was an error sending the email export request: {response_text}", "content_type": "text"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

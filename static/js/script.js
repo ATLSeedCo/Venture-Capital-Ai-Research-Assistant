@@ -7,12 +7,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showEmailConfirmation(message, isError = false) {
         const confirmationElement = document.getElementById('emailConfirmation');
-        confirmationElement.textContent = message;
+        if (typeof message === 'string') {
+            confirmationElement.textContent = message;
+        } else {
+            confirmationElement.innerHTML = message;
+        }
         confirmationElement.style.color = isError ? 'red' : 'green';
         confirmationElement.style.display = 'block';
-        setTimeout(() => {
-            confirmationElement.style.display = 'none';
-        }, 5000);
+        // Remove the timeout to keep the message visible
     }
 
     function toggleLoadingSpinner(show, elementId) {
@@ -138,7 +140,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.error) {
                 showEmailConfirmation(`Failed to send email: ${data.error}`, true);
             } else {
-                showEmailConfirmation(data.message || 'Email Sent!');
+                if (data.content_type === 'html') {
+                    // Safely render HTML content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data.message;
+                    showEmailConfirmation(tempDiv.innerHTML);
+                } else {
+                    showEmailConfirmation(data.message || 'Email Sent!');
+                }
                 document.getElementById('emailInput').value = ''; // Clear the email input
             }
         })
