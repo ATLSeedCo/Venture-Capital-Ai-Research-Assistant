@@ -30,10 +30,8 @@ def index():
             response.raise_for_status()
             logging.info(f"Received response from webhook: {response.status_code}")
             
-            # Log the response content for debugging
             logging.debug(f"Response content: {response.text}")
 
-            # Attempt to parse the JSON response
             try:
                 data = response.json()
                 logging.info("Successfully parsed JSON response")
@@ -53,6 +51,28 @@ def index():
             return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
     
     return render_template('index.html')
+
+@app.route('/export_email', methods=['POST'])
+def export_email():
+    email = request.form['email']
+    research_data = request.form['research_data']
+    
+    email_export_webhook_url = os.getenv('EMAIL_EXPORT_WEBHOOK_URL')
+    payload = {
+        "email": email,
+        "research_data": research_data
+    }
+    
+    try:
+        logging.info(f"Sending email export request for email: {email}")
+        response = requests.post(email_export_webhook_url, json=payload, timeout=60)
+        response.raise_for_status()
+        logging.info(f"Received response from email export webhook: {response.status_code}")
+        
+        return jsonify({"message": "Email export request sent successfully"}), 200
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Email export webhook request failed: {str(e)}")
+        return jsonify({"error": f"There was an error sending the email export request: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

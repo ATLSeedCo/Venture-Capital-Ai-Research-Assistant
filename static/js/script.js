@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('researchForm');
     const loadingElement = document.getElementById('loading');
     const resultsElement = document.getElementById('results');
+    const emailExportElement = document.getElementById('emailExport');
+    const emailForm = document.getElementById('emailForm');
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -13,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingElement.style.display = 'block';
         loadingElement.innerHTML = '<p>Running Research Analysis</p><div class="spinner"></div>';
         resultsElement.innerHTML = '';
+        emailExportElement.style.display = 'none';
 
         // Send POST request to server
         fetch('/', {
@@ -43,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('Failed to parse JSON response');
             }
 
-            // Define the desired order of sections, now including Competitors
+            // Define the desired order of sections
             const sectionOrder = [
                 "Company Name",
                 "Company Overview",
@@ -68,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             resultsElement.innerHTML = analysisHtml;
+            emailExportElement.style.display = 'block';
         })
         .catch(error => {
             // Hide loading message and spinner
@@ -76,6 +80,37 @@ document.addEventListener('DOMContentLoaded', function() {
             // Display detailed error message
             resultsElement.innerHTML = `<h2>Error:</h2><p>${error.message}</p>`;
             console.error('Error:', error);
+        });
+    });
+
+    emailForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('emailInput').value;
+        const researchData = resultsElement.innerHTML;
+
+        fetch('/export_email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'email': email,
+                'research_data': researchData
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to send email export request. Please try again.');
         });
     });
 });
