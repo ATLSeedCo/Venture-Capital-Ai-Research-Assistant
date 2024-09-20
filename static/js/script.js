@@ -10,6 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmationElement.innerHTML = message;
         confirmationElement.style.color = isError ? 'red' : 'green';
         confirmationElement.style.display = 'block';
+
+        // Make sure links are clickable
+        const links = confirmationElement.getElementsByTagName('a');
+        for (let i = 0; i < links.length; i++) {
+            links[i].style.color = 'blue';
+            links[i].style.textDecoration = 'underline';
+            links[i].style.cursor = 'pointer';
+        }
     }
 
     function toggleLoadingSpinner(show, elementId) {
