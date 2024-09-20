@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const email = document.getElementById('emailInput').value;
         const researchData = resultsElement.innerHTML;
+        const companyName = document.getElementById('companyName').value;
 
         // Show loading spinner
         const confirmationElement = document.getElementById('emailConfirmation');
@@ -137,7 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: new URLSearchParams({
                 'email': email,
-                'research_data': researchData
+                'research_data': researchData,
+                'company_name': companyName
             })
         })
         .then(response => {

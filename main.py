@@ -56,11 +56,13 @@ def index():
 def export_email():
     email = request.form['email']
     research_data = request.form['research_data']
+    company_name = request.form['company_name']
     
     email_export_webhook_url = os.getenv('EMAIL_EXPORT_WEBHOOK_URL')
     payload = {
         "email": email,
-        "research_data": research_data
+        "research_data": research_data,
+        "company_name": company_name
     }
     
     try:
