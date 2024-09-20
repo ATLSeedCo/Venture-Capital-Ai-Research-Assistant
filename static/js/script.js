@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.error) {
                 showEmailConfirmation(`Failed to send email: ${data.error}`, true);
             } else {
-                showEmailConfirmation('Email Sent! ' + (data.message || ''));
+                showEmailConfirmation(data.message || 'Email Sent!');
                 document.getElementById('emailInput').value = ''; // Clear the email input
             }
         })
