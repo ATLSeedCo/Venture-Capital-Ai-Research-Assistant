@@ -13,21 +13,52 @@ document.addEventListener('DOMContentLoaded', function() {
         const tempElement = document.createElement('div');
         tempElement.innerHTML = message;
         
-        // Append the parsed content to the confirmation element
+        // Process the content to ensure links are clickable
+        const processNode = (node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const linkRegex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)/g;
+                let match;
+                let lastIndex = 0;
+                const fragment = document.createDocumentFragment();
+                
+                while ((match = linkRegex.exec(node.textContent)) !== null) {
+                    // Add text before the link
+                    if (match.index > lastIndex) {
+                        fragment.appendChild(document.createTextNode(node.textContent.substring(lastIndex, match.index)));
+                    }
+                    
+                    // Create the link
+                    const link = document.createElement('a');
+                    link.href = match[2];
+                    link.textContent = match[2];
+                    link.style.color = 'blue';
+                    link.style.textDecoration = 'underline';
+                    link.style.cursor = 'pointer';
+                    fragment.appendChild(link);
+                    
+                    lastIndex = linkRegex.lastIndex;
+                }
+                
+                // Add any remaining text
+                if (lastIndex < node.textContent.length) {
+                    fragment.appendChild(document.createTextNode(node.textContent.substring(lastIndex)));
+                }
+                
+                node.parentNode.replaceChild(fragment, node);
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                Array.from(node.childNodes).forEach(processNode);
+            }
+        };
+        
+        processNode(tempElement);
+        
+        // Append the processed content to the confirmation element
         while (tempElement.firstChild) {
             confirmationElement.appendChild(tempElement.firstChild);
         }
         
         confirmationElement.style.color = isError ? 'red' : 'green';
         confirmationElement.style.display = 'block';
-
-        // Make sure links are clickable
-        const links = confirmationElement.getElementsByTagName('a');
-        for (let i = 0; i < links.length; i++) {
-            links[i].style.color = 'blue';
-            links[i].style.textDecoration = 'underline';
-            links[i].style.cursor = 'pointer';
-        }
     }
 
     function toggleLoadingSpinner(show, elementId) {
