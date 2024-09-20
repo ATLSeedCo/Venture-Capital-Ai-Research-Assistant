@@ -7,14 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showEmailConfirmation(message, isError = false) {
         const confirmationElement = document.getElementById('emailConfirmation');
-        if (typeof message === 'string') {
-            confirmationElement.textContent = message;
-        } else {
-            confirmationElement.innerHTML = message;
-        }
+        confirmationElement.innerHTML = message;
         confirmationElement.style.color = isError ? 'red' : 'green';
         confirmationElement.style.display = 'block';
-        // Remove the timeout to keep the message visible
     }
 
     function toggleLoadingSpinner(show, elementId) {
@@ -141,10 +136,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 showEmailConfirmation(`Failed to send email: ${data.error}`, true);
             } else {
                 if (data.content_type === 'html') {
-                    // Safely render HTML content
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = data.message;
-                    showEmailConfirmation(tempDiv.innerHTML);
+                    // Directly set the innerHTML to render the HTML content
+                    showEmailConfirmation(data.message);
                 } else {
                     showEmailConfirmation(data.message || 'Email Sent!');
                 }
