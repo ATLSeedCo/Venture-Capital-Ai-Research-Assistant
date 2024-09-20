@@ -5,6 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const emailExportElement = document.getElementById('emailExport');
     const emailForm = document.getElementById('emailForm');
 
+    function showEmailConfirmation(message) {
+        const confirmationElement = document.getElementById('emailConfirmation');
+        confirmationElement.textContent = message;
+        confirmationElement.style.display = 'block';
+        setTimeout(() => {
+            confirmationElement.style.display = 'none';
+        }, 3000);
+    }
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -106,11 +115,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            alert(data.message);
+            showEmailConfirmation('Email Sent!');
+            document.getElementById('emailInput').value = ''; // Clear the email input
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to send email export request. Please try again.');
+            showEmailConfirmation('Failed to send email. Please try again.');
         });
     });
 });
