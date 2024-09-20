@@ -7,7 +7,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showEmailConfirmation(message, isError = false) {
         const confirmationElement = document.getElementById('emailConfirmation');
-        confirmationElement.innerHTML = message;
+        confirmationElement.innerHTML = ''; // Clear previous content
+        
+        // Create a temporary element to parse the HTML
+        const tempElement = document.createElement('div');
+        tempElement.innerHTML = message;
+        
+        // Append the parsed content to the confirmation element
+        while (tempElement.firstChild) {
+            confirmationElement.appendChild(tempElement.firstChild);
+        }
+        
         confirmationElement.style.color = isError ? 'red' : 'green';
         confirmationElement.style.display = 'block';
 
